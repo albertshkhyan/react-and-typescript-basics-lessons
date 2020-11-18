@@ -2,7 +2,7 @@ import React from 'react';
 // import logo from './logo.svg';
 import './App.css';
 
-/**----------------------------------------- */
+/**-------------------- Simple class --------------------- */
 // class Counter extends React.Component {
 // 	state = {
 // 		count: 0,
@@ -24,13 +24,13 @@ import './App.css';
 // 	}
 // }
 
-/**----------------------------------------- */
+/**-------------------- with ts class --------------------- */
 //Typeing class component - we again use generic types (<>)
 /**
  * 1 generics is props typeing
  * 2 generics is state typeing
  */
-// class Counter extends React.Component<{}, { count: number }> {
+// class Counter extends React.Component<{},{ count: number }> {
 // 	state = {
 // 		count: 0,
 // 	};
@@ -58,6 +58,14 @@ import './App.css';
 //Without type we can use interface, for more opportunities (example interfaces can extend from another interface)
 
 //by default state is read-only but in props we can specify readonly modificator
+
+/**type keyword - designed to create for aliases type. (we can create our castom type)
+	 * type - It's used for "type aliases".
+		ex: 
+			type StringOrNumber = string | number;
+
+ */
+
 // type CounterState = {
 // 	count: number;
 // };
@@ -68,7 +76,7 @@ import './App.css';
 // };
 
 // class Counter extends React.Component<CounterProps, CounterState> {
-// 	//# when use constructor
+// 	//# 1 v -  when use constructor
 // 	// constructor(props) {//error
 // 	// Here we props are typeing 2 time, in generic type and in constructor.
 // 	constructor(props: CounterProps) {
@@ -78,13 +86,14 @@ import './App.css';
 // 		};
 // 	}
 
-// 	//# when not use constructor
+// 	//# 2 v -  when not use constructor
 // 	// state = {
 // 	// 	count: 0,
 // 	// };
 
 // 	//# Default props ts+react
 // 	static defaultProps: CounterProps = {
+// 		//defaultProps not variable, it reserve word
 // 		title: 'this is my default props :)',
 // 	};
 
