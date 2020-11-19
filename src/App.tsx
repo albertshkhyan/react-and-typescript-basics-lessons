@@ -2,128 +2,36 @@ import React from 'react';
 // import logo from './logo.svg';
 import './App.css';
 
-/**-------------------- Simple class --------------------- */
-// class Counter extends React.Component {
-// 	state = {
-// 		count: 0,
-// 	};
-
-// 	handleClick = () => {
-// 		this.setState(({ count }) => ({
-// 			count: ++count,
-// 		}));
-// 	};
-
-// 	render() {
-// 		return (
-// 			<>
-// 				<h2>{this.state.count}</h2>
-// 				<button onClick={this.handleClick}>+1</button>
-// 			</>
-// 		);
-// 	}
-// }
-
-/**-------------------- with ts class --------------------- */
-//Typeing class component - we again use generic types (<>)
+/*****************************Typeing of Events ****************************/
 /**
- * 1 generics is props typeing
- * 2 generics is state typeing
- */
-// class Counter extends React.Component<{},{ count: number }> {
-// 	state = {
-// 		count: 0,
-// 	};
+ * events in react are not just events in their classical sense, they use their own wrapper, the so-called Syntetic-Event. This is necessary for better cross-browser compatibility. 
+ And since such a wrapper exists, then for this setting, special event types were developed.
+	Full list of event types
+		- DragEvent
+		- FormEvent
+		- mouseEvent
+		- TouchEvent
+		- WheelEvent
+		- FocusEvent
+		- ChangeEvent
+		- PointerEvent
+		- KeyboardEvent
+		- AnimationEvent
+		- ClipboardEvent
+		- TransitionEvent
+		- CompositionEvent
 
-// 	handleClick = () => {
-// 		this.setState(({ count }) => ({
-// 			count: ++count,
-// 		}));
-// 	};
-
-// 	render() {
-// 		return (
-// 			<>
-// 				<h2>{this.state.count}</h2>
-// 				<button onClick={this.handleClick}>+1</button>
-// 			</>
-// 		);
-// 	}
-// }
-
-/**----------------------------------------- */
-
-//# if the number of these values increases, then the best option is to create separate types
-
-//Without type we can use interface, for more opportunities (example interfaces can extend from another interface)
-
-//by default state is read-only but in props we can specify readonly modificator
-
-/**type keyword - designed to create for aliases type. (we can create our castom type)
-	 * type - It's used for "type aliases".
-		ex: 
-			type StringOrNumber = string | number;
+		But we will use the most basics
 
  */
-
-// type CounterState = {
-// 	count: number;
-// };
-
-// type CounterProps = {
-// 	//after  this field will give error, because it we must transfer to our compnent or we can specify it as optional (?)
-// 	title: string;
-// };
-
-// class Counter extends React.Component<CounterProps, CounterState> {
-// 	//# 1 v -  when use constructor
-// 	// constructor(props) {//error
-// 	// Here we props are typeing 2 time, in generic type and in constructor.
-// 	constructor(props: CounterProps) {
-// 		super(props);
-// 		this.state = {
-// 			count: 0,
-// 		};
-// 	}
-
-// 	//# 2 v -  when not use constructor
-// 	// state = {
-// 	// 	count: 0,
-// 	// };
-
-// 	//# Default props ts+react
-// 	static defaultProps: CounterProps = {
-// 		//defaultProps not variable, it reserve word
-// 		title: 'this is my default props :)',
-// 	};
-
-// 	handleClick = () => {
-// 		this.setState(({ count }) => ({
-// 			count: ++count,
-// 		}));
-// 		// this.state.count = 1; // Cannot assign to 'count' because it is a read-only property.
-// 	};
-
-// 	render() {
-// 		// this.props.title = 'another text'; // default alredy read-only to like state, not need specify readonly modificator -  give warning becase in above (type CounterProps) we specify props (title field) as readonly
-// 		return (
-// 			<>
-// 				<h2>{this.state.count}</h2>
-// 				<h3>{this.props.title}</h3>
-// 				<button onClick={this.handleClick}>+1</button>
-// 			</>
-// 		);
-// 	}
-// }
-
-/**------------------- Typeing of lifecycle ---------------------- */
+//# PREVIOUS EXAMPLE
 
 type CounterState = {
 	count: number;
 };
 
 type CounterProps = {
-	title: string;
+	title?: string;
 };
 
 class Counter extends React.Component<CounterProps, CounterState> {
@@ -132,49 +40,73 @@ class Counter extends React.Component<CounterProps, CounterState> {
 		count: 0,
 	};
 
-	//# Default props ts+react
-	static defaultProps: CounterProps = {
-		title: 'this is my default props :)',
-	};
-
+	/*
+	* no give error withour parameter
 	handleClick = () => {
 		this.setState(({ count }) => ({
 			count: ++count,
 		}));
 	};
+	*/
 
-	/**
-	 * typing these methods (lifecycles) is not difficult because these are ordinary functions and all we need to do is << describe the arguments>> and << the returned result >>
+	// handleClick = (e) => {//🚫⚠ Error
+	// 	this.setState(({ count }) => ({
+	// 		count: ++count,
+	// 	}));
+	// };
+
+	/*
+	 * when we set parameter  at the compilation stage we get an error we need to define the type of event
 	 */
-
-	/**
-	 * getDerivedStateFromProps
-      is invoked right before calling the render method
-      It should return an object to update the state, or null to update nothing.
+	//#Variant 1
+	// handleClick = (e: React.SyntheticEvent) => {
+	/**e: React.SynteticEvent - this is a perfectly valid case, however the typing itself is a bit vague(not specific).
+	 * React.SyntheticEvent -> React.Mouseevent
 	 */
+	// handleClick = (e: React.MouseEvent) => {
+	// 	console.log('e', e.clientX, e.clientY); //print the click coordinates to the console (use e variable)
+	// 	this.setState(({ count }) => ({
+	// 		count: ++count,
+	// 	}));
+	// };
 
-	//# << describe the arguments>>
-	// static getDerivedStateFromProps(props: CounterProps, state: CounterState) {}
+	//#Variant 2
+	/** # Restrictive Event Handling
+	 * * we can also type the element on which events are triggered
+		* for this task is used generic html + element type
+			React.MouseEvent<here we specidy the element on whcih work our event>
+				React.MouseEvent<HTMLButtonElement> - we indicate the type of element on which we catch this event.
+					⚠ When we try add handleCick(event handler) on another element (example link)
+						<a href="http://re.zm/or" onClick={this.handleClick}></a> ❌
 
-	// componentDidMount() {}
+	 */
+	// handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+	// 	console.log('e', e.clientX, e.clientY); //print the click coordinates to the console (use e variable)
+	// 	this.setState(({ count }) => ({
+	// 		count: ++count,
+	// 	}));
+	// };
 
-	// shouldComponentUpdate(nextProps: CounterProps, nextState: CounterState) {
-	// 	return true;
-	// }
+	//#Variant 3
+	/**
+	 * * in order to add support for both elements we need to extend our generic
+	 *  React.MouseEvent<HTMLButtonElement or(|)  >
+			 React.MouseEvent<HTMLButtonElement | HTMLAnchorElement> - For like this manipulation used @types/react-dom
+			 🙄☝ see how accurately we can type events. Not only do we determine the type of the event itself, we also determine and control the type of the element.	
 
-	//# << the returned result >>
-	//getDerivedStateFromProps - It should return an object to update the state, or null to update nothing.
+	 */
+	handleClick = (e: React.MouseEvent<HTMLButtonElement | HTMLAnchorElement>) => {
+		console.log('e', e.clientX, e.clientY); //print the click coordinates to the console (use e variable)
+		this.setState(({ count }) => ({
+			count: ++count,
+		}));
+	};
 	static getDerivedStateFromProps(props: CounterProps, state: CounterState): CounterState | null {
 		return true ? { count: 2 } : null; //get rid of warning
 	}
 
-	// componentDidMount - returns nothing and accepts nothing but serves for some additional calculations before the final rendering, for this we just use void
-	// componentDidMount() {}
-	componentDidMount(): void {
-		//void - no return data
-	}
+	componentDidMount(): void {}
 
-	// shouldComponentUpdate - based on internal calculations, determines whether the component should be updated or not. its always return boolean value
 	shouldComponentUpdate(nextProps: CounterProps, nextState: CounterState): boolean {
 		return true;
 	}
@@ -185,14 +117,19 @@ class Counter extends React.Component<CounterProps, CounterState> {
 				<h2>{this.state.count}</h2>
 				<h3>{this.props.title}</h3>
 				<button onClick={this.handleClick}>+1</button>
+				{/**Error:  in below example: React.MouseEvent<HTMLButtonElement>*/}
+				{/* <a href="http://re.zm/or" onClick={this.handleClick}></a> */}
+				{/**OK: Suport event handler button and anchor element*/}
+				<a href="http://re.zm/or" onClick={this.handleClick}>
+					Some link
+				</a>
 			</>
 		);
 	}
 }
 
 function App() {
-	// return <Counter title="This is my title with CounterProps" />;
-	return <Counter />; //when we not specify title work our default props whcih we define in Counter component
+	return <Counter />;
 }
 
 export default App;
