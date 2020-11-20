@@ -1,55 +1,127 @@
-import React from 'react';
-// import logo from './logo.svg';
-import './App.css';
+import React, { Component } from 'react';
 
-/*****************************Typeing of Events ****************************/
-/* -------------------------------------------------------------------------- */
-/*                               WORK WITH FORMS                              */
-/* -------------------------------------------------------------------------- */
+type Position = {
+	id: string;
+	value: string;
+	title: string;
+};
 
-class Form extends React.Component<{}, {}> {
-	//# variant 1
-	// handleFocus = (e) => {//❌
-	// handleFocus = (e: React.FocusEvent) => {
-	//* specify the element on which the events are triggered. ☝⚠ When we do specific typeing autocomplete work better.
-	handleFocus = (e: React.FocusEvent<HTMLInputElement>) => {
-		console.log('e.currentTarget', e.currentTarget); //<input type="text" name="text">
+type FormState = {
+	inputText: string;
+	textareaText: string;
+	selectText: string;
+	showData: {
+		name: string;
+		text: string;
+		position: string;
+	};
+};
+
+const POSITIONS: Array<Position> = [
+	{
+		id: 'fd',
+		value: 'Front-end Developer',
+		title: 'Front-end Developer title',
+	},
+	{
+		id: 'bd',
+		value: 'Back-end Developer',
+		title: 'Back-end Developer title',
+	},
+];
+
+const DEFAULT_SELECT_VALUE: string = POSITIONS[0].value;
+//# typeing css in react
+const styles: React.CSSProperties = { display: 'block', marginBottom: '10px' };
+
+class Form extends Component<{}, FormState> {
+	state = {
+		inputText: '',
+		textareaText: '',
+		selectText: DEFAULT_SELECT_VALUE,
+		showData: {
+			name: '',
+			text: '',
+			position: '',
+		},
 	};
 
-	//# varaint  2
-	/**
-	 * * React.ClipboardEvent - this type of event describes operations copy, cut and paste.
-	 * onCopy event
-	 */
+	//# typeing of links (refs)
+	private rootRef = React.createRef<HTMLSelectElement>();
 
-	handleCopy = (e: React.ClipboardEvent<HTMLInputElement>) => {
-		console.log('Coppied!');
+	handleInputChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
+		const {
+			target: { value: inputText },
+		} = e;
+		this.setState({ inputText });
 	};
-	handlSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+
+	handleTextareaChange = (e: React.ChangeEvent<HTMLTextAreaElement>): void => {
+		const {
+			target: { value: textareaText },
+		} = e;
+		this.setState({ textareaText });
+	};
+
+	handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>): void => {
+		const {
+			target: { value: selectText },
+		} = e;
+		this.setState({ selectText });
+	};
+
+	handleShow = (e: React.MouseEvent<HTMLButtonElement>): void => {
 		e.preventDefault();
-		console.log('Submitted!');
+		const { inputText, textareaText, selectText } = this.state;
+
+		this.setState({
+			inputText: '',
+			textareaText: '',
+			selectText: DEFAULT_SELECT_VALUE,
+			showData: {
+				name: inputText,
+				text: textareaText,
+				position: selectText,
+			},
+		});
 	};
 
-	/**
-	 * * similarly, some types of events have their own unique properties for example:
-	 * KeyboardEvent -  store information about the pressed button.
-	 * ☝⚠ Fox access on all propeties, need do typeing exactly(specific).
-	 */
 	render() {
+		const { inputText, textareaText, selectText, showData } = this.state;
+		const { name, text, position } = showData;
+
 		return (
-			<form onSubmit={this.handlSubmit}>
-				<label htmlFor="">
-					Simple Text
-					<input onCopy={this.handleCopy} onFocus={this.handleFocus} type="text" name="text" />
-				</label>
-				<button type="submit">Submit</button>
-			</form>
+			<>
+				<form>
+					<label style={styles}>
+						Name:
+						<input type="text" value={inputText} onChange={this.handleInputChange} />
+					</label>
+
+					<label style={styles}>
+						Text:
+						<textarea value={textareaText} onChange={this.handleTextareaChange} />
+					</label>
+
+					<select style={styles} value={selectText} onChange={this.handleSelectChange} ref={this.rootRef}>
+						{POSITIONS.map(({ id, value, title }) => (
+							<option key={id} value={value}>
+								{title}
+							</option>
+						))}
+					</select>
+
+					<button onClick={this.handleShow}>Show Data</button>
+				</form>
+
+				<h2>{name}</h2>
+				<h3>{text}</h3>
+				<h3>{position}</h3>
+			</>
 		);
 	}
 }
 
-function App() {
-	return <Form />;
-}
+const App: React.FC = () => <Form />;
 
 export default App;
